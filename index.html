@@ -1,0 +1,609 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Atmos - Live Weather Dashboard</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    min-height: 100vh;
+    padding: 30px 16px;
+    color: white;
+    background:
+        radial-gradient(circle at top left, #315c91, transparent 45%),
+        linear-gradient(135deg, #10182e, #1a3155, #111827);
+}
+
+.container {
+    max-width: 950px;
+    margin: auto;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 15px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.logo span {
+    color: #67e8f9;
+}
+
+.tagline {
+    color: #a5f3fc;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.search-box {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.search-box input {
+    flex: 1;
+    min-width: 0;
+    padding: 16px;
+    border-radius: 12px;
+    border: 1px solid #ffffff30;
+    background: #ffffff12;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.search-box input::placeholder {
+    color: #b9c5d8;
+}
+
+button {
+    padding: 14px 23px;
+    border: none;
+    border-radius: 12px;
+    background: #67e8f9;
+    color: #10213b;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #a5f3fc;
+}
+
+.hero, .card, .history {
+    background: #ffffff10;
+    border: 1px solid #ffffff20;
+    border-radius: 22px;
+    backdrop-filter: blur(15px);
+}
+
+.hero {
+    padding: 30px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.location {
+    color: #cbd5e1;
+    font-size: 16px;
+}
+
+.hero h2 {
+    font-size: clamp(22px, 4vw, 34px);
+    margin: 12px 0;
+}
+
+.temp {
+    font-size: clamp(55px, 12vw, 85px);
+    font-weight: 300;
+    letter-spacing: -4px;
+}
+
+.condition {
+    color: #a5f3fc;
+    font-size: 18px;
+}
+
+.feels {
+    margin-top: 12px;
+    color: #cbd5e1;
+    font-size: 14px;
+}
+
+.weather-icon {
+    font-size: 75px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.card {
+    padding: 23px;
+}
+
+.card-icon {
+    font-size: 25px;
+    margin-bottom: 13px;
+}
+
+.card-label {
+    color: #bdc9dc;
+    font-size: 14px;
+}
+
+.card-value {
+    font-size: 29px;
+    font-weight: 700;
+    margin: 14px 0 7px;
+}
+
+.card small {
+    color: #9fb1ca;
+}
+
+#message {
+    color: #a5f3fc;
+    text-align: center;
+    margin: 20px 0;
+    overflow-wrap: anywhere;
+}
+
+.history {
+    margin-top: 25px;
+    padding: 22px;
+}
+
+.history h3 {
+    margin-bottom: 15px;
+}
+
+.history-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #ffffff20;
+    color: #dbeafe;
+    font-size: 14px;
+}
+
+.history-item:last-child {
+    border-bottom: none;
+}
+
+.footer {
+    text-align: center;
+    color: #8294b0;
+    font-size: 12px;
+    margin-top: 25px;
+}
+
+@media (max-width: 520px) {
+    .hero {
+        padding: 20px;
+    }
+
+    .weather-icon {
+        font-size: 50px;
+    }
+
+    .card {
+        padding: 16px;
+    }
+
+    .card-value {
+        font-size: 24px;
+    }
+
+    .tagline {
+        display: none;
+    }
+
+    .search-box button {
+        padding: 12px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header>
+        <div class="logo">☁ Atmos<span>.</span></div>
+        <div class="tagline">LIVE WEATHER DASHBOARD</div>
+    </header>
+
+    <form class="search-box" id="searchForm">
+        <input
+            type="text"
+            id="place"
+            placeholder="Search city: Chennai, Madurai..."
+            value="Chennai"
+            required
+        >
+        <button type="submit">Search</button>
+    </form>
+
+    <section class="hero">
+        <div>
+            <div class="location" id="location">
+                Loading location...
+            </div>
+
+            <h2 id="date">Current Weather</h2>
+
+            <div class="temp">
+                <span id="temperature">--</span>°
+            </div>
+
+            <div class="condition" id="condition">
+                Fetching weather...
+            </div>
+
+            <div class="feels">
+                Feels like <span id="feels">--</span>°C
+            </div>
+        </div>
+
+        <div class="weather-icon" id="weatherIcon">🌤️</div>
+    </section>
+
+    <section class="grid">
+
+        <div class="card">
+            <div class="card-icon">💧</div>
+            <div class="card-label">Humidity</div>
+            <div class="card-value">
+                <span id="humidity">--</span>%
+            </div>
+            <small>Relative humidity</small>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">🌡️</div>
+            <div class="card-label">Air Pressure</div>
+            <div class="card-value">
+                <span id="pressure">--</span>
+            </div>
+            <small>hPa · Sea-level pressure</small>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">💨</div>
+            <div class="card-label">Wind Speed</div>
+            <div class="card-value">
+                <span id="wind">--</span>
+            </div>
+            <small>km/h</small>
+        </div>
+
+        <div class="card">
+            <div class="card-icon">☁️</div>
+            <div class="card-label">Cloud Cover</div>
+            <div class="card-value">
+                <span id="cloud">--</span>%
+            </div>
+            <small>Cloud coverage</small>
+        </div>
+
+    </section>
+
+    <p id="message" role="status">Loading weather...</p>
+
+    <section class="history">
+        <h3>🕘 Recent Searches</h3>
+        <div id="historyList">
+            <p>Search history will appear here.</p>
+        </div>
+    </section>
+
+    <div class="footer">
+        Weather data: Open-Meteo | Search history: Firebase
+    </div>
+
+</div>
+
+<script type="module">
+
+// Firebase imports
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+
+import {
+    getFirestore,
+    collection,
+    addDoc,
+    serverTimestamp,
+    query,
+    orderBy,
+    limit,
+    getDocs
+}
+from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDx20YoRDBcGaPgjJ8JYw-J1oTdlHkRqWw",
+    authDomain: "weather-reporter-fed13.firebaseapp.com",
+    projectId: "weather-reporter-fed13",
+    storageBucket: "weather-reporter-fed13.firebasestorage.app",
+    messagingSenderId: "798607425952",
+    appId: "1:798607425952:web:08531cb2b6674ed3aba4c5",
+    measurementId: "G-RTSXXSQQFF"
+};
+
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+// Helper function
+const $ = id => document.getElementById(id);
+
+
+// Weather descriptions
+function weatherDescription(code) {
+
+    if (code === 0) return ["Clear sky", "☀️"];
+
+    if (code === 1 || code === 2)
+        return ["Partly cloudy", "🌤️"];
+
+    if (code === 3)
+        return ["Overcast", "☁️"];
+
+    if (code === 45 || code === 48)
+        return ["Foggy", "🌫️"];
+
+    if ([51, 53, 55, 56, 57].includes(code))
+        return ["Drizzle", "🌦️"];
+
+    if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code))
+        return ["Rain", "🌧️"];
+
+    if ([71, 73, 75, 77, 85, 86].includes(code))
+        return ["Snow", "❄️"];
+
+    if ([95, 96, 99].includes(code))
+        return ["Thunderstorm", "⛈️"];
+
+    return ["Current conditions", "🌡️"];
+}
+
+
+// Save a search to Firebase
+async function saveSearch(place, weather, description) {
+
+    try {
+        await addDoc(collection(db, "weatherSearches"), {
+            city: place.name,
+            country: place.country || "",
+            latitude: place.latitude,
+            longitude: place.longitude,
+            temperature: weather.temperature_2m,
+            humidity: weather.relative_humidity_2m,
+            pressure: weather.pressure_msl,
+            windSpeed: weather.wind_speed_10m,
+            condition: description,
+            searchedAt: serverTimestamp()
+        });
+
+        await loadHistory();
+
+    } catch (error) {
+        console.error("Firebase save error:", error);
+        $("message").textContent =
+            "Weather loaded. Firebase history could not be saved.";
+    }
+}
+
+
+// Load recent search history from Firebase
+async function loadHistory() {
+
+    try {
+        const historyQuery = query(
+            collection(db, "weatherSearches"),
+            orderBy("searchedAt", "desc"),
+            limit(5)
+        );
+
+        const snapshot = await getDocs(historyQuery);
+        const list = $("historyList");
+
+        list.replaceChildren();
+
+        if (snapshot.empty) {
+            list.textContent = "No searches saved yet.";
+            return;
+        }
+
+        snapshot.forEach(documentSnapshot => {
+
+            const item = documentSnapshot.data();
+
+            const row = document.createElement("div");
+            row.className = "history-item";
+
+            const city = document.createElement("span");
+            city.textContent =
+                item.city + (item.country ? ", " + item.country : "");
+
+            const temp = document.createElement("span");
+            temp.textContent =
+                Number(item.temperature).toFixed(1) + "°C";
+
+            row.append(city, temp);
+            list.appendChild(row);
+        });
+
+    } catch (error) {
+        console.warn("Could not load Firebase history:", error);
+        $("historyList").textContent =
+            "History unavailable. Check Firestore setup and rules.";
+    }
+}
+
+
+// Search a city and display its weather
+async function loadWeather(city) {
+
+    $("message").textContent =
+        "Searching weather for " + city + "...";
+
+    try {
+
+        // Step 1: Find coordinates for the city
+        const geocodingURL =
+            "https://geocoding-api.open-meteo.com/v1/search?name=" +
+            encodeURIComponent(city) +
+            "&count=1&language=en&format=json";
+
+        const geoResponse = await fetch(geocodingURL);
+
+        if (!geoResponse.ok)
+            throw new Error("Unable to search for this location.");
+
+        const geoData = await geoResponse.json();
+
+        if (!geoData.results || geoData.results.length === 0) {
+            throw new Error("Place not found. Try another city name.");
+        }
+
+        const place = geoData.results[0];
+
+
+        // Step 2: Request current weather
+        const params = new URLSearchParams({
+            latitude: place.latitude,
+            longitude: place.longitude,
+            current: [
+                "temperature_2m",
+                "relative_humidity_2m",
+                "apparent_temperature",
+                "pressure_msl",
+                "wind_speed_10m",
+                "cloud_cover",
+                "weather_code"
+            ].join(","),
+            timezone: "auto"
+        });
+
+        const weatherURL =
+            "https://api.open-meteo.com/v1/forecast?" + params;
+
+        const response = await fetch(weatherURL);
+
+        if (!response.ok)
+            throw new Error("Weather service is unavailable.");
+
+        const data = await response.json();
+        const weather = data.current;
+
+        const [description, icon] =
+            weatherDescription(weather.weather_code);
+
+
+        // Step 3: Display weather information
+        $("location").textContent =
+            [place.name, place.admin1, place.country]
+                .filter(Boolean)
+                .join(", ");
+
+        $("date").textContent = new Date().toLocaleDateString(
+            "en-IN",
+            {
+                weekday: "long",
+                day: "numeric",
+                month: "long"
+            }
+        );
+
+        $("temperature").textContent =
+            Math.round(weather.temperature_2m);
+
+        $("condition").textContent = description;
+        $("weatherIcon").textContent = icon;
+
+        $("feels").textContent =
+            Math.round(weather.apparent_temperature);
+
+        $("humidity").textContent =
+            weather.relative_humidity_2m;
+
+        $("pressure").textContent =
+            Math.round(weather.pressure_msl);
+
+        $("wind").textContent =
+            Number(weather.wind_speed_10m).toFixed(1);
+
+        $("cloud").textContent = weather.cloud_cover;
+
+        $("message").textContent =
+            "Weather updated · " +
+            String(weather.time || "").replace("T", " ") +
+            " (local time)";
+
+
+        // Step 4: Save weather search in Firebase
+        await saveSearch(place, weather, description);
+
+    } catch (error) {
+
+        console.error(error);
+        $("message").textContent = error.message;
+    }
+}
+
+
+// Search form event
+$("searchForm").addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const city = $("place").value.trim();
+
+    if (city) {
+        loadWeather(city);
+    }
+});
+
+
+// Start the application
+loadWeather("Chennai");
+loadHistory();
+
+</script>
+
+</body>
+</html>
+```
